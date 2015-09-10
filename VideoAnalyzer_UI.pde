@@ -1,20 +1,30 @@
 
-void keyPressed() {
-  //if ((key == 'Q') || (key == 'q')) {
-  //  terminate();
-  //}
+int last_autosave = 0;
+
+
+//                                                                                  ________________
+//_________________________________________________________________________________/  keyPressed()
+void keyPressed()
+{
   if (key == ' ' || (key ==  CODED && keyCode == CONTROL)) {
     ctrl_pressed = true;
     mov.play();
   }
 }
 
-void keyReleased() {
+//                                                                                  ________________
+//_________________________________________________________________________________/ keyReleased()
+void keyReleased()
+{
+  // [SPACE] or [CTRL]
+  // Playback
   if (key == ' ' || (key == CODED && keyCode ==  CONTROL)) {
     ctrl_pressed = false;
     mov.jump(current_time);
     mov.pause();
   }
+  
+  // When currently editing the track name: normal typing input
   if (edit_name_mode) {
     if(key == ENTER) {
       edit_name_mode = false;
@@ -26,14 +36,19 @@ void keyReleased() {
     } else {
       annotations.get(current_track).name += key;
     }
-    
     return;
   }
+  
+  // [A] Key:
+  // Create new annotation track.
   if (key== 'a' || key=='A') {
     Annotation a = new Annotation();
     a.name = "new";
     annotations.add(a);
   }
+  
+  // [E] Key:
+  // Edit current track name.
   if (key== 'e' || key=='E') {
     int i = mouseY / 20;
     if(i >= 0 && i < annotations.size()) {
@@ -42,10 +57,15 @@ void keyReleased() {
     }
   }
   
+  // [S] KEY:
+  // Safe annotations
   if (key== 's' || key=='S') {
-    saveAnnotations();
+    makeBackup();
+    saveAnnotations(path);
   }
-  // Delete timeslot under currently under the mouse
+  
+  // [D] KEY:
+  // Delete the timeslot currently under the mouse
   if (key== 'd' || key=='D') {
     int i = mouseY / 20;
     if(i < 0 || i >= annotations.size()) {
@@ -63,8 +83,13 @@ void keyReleased() {
 }
 
 
-
-void mousePressed() {
+//                                                                                  ________________
+//_________________________________________________________________________________/ mousePressed()
+void mousePressed()
+{
+  if(mouseButton == RIGHT) {
+    return; // nothing to do for right mouse button press
+  }
   // test if we hit the time slider buttons
   if(mouseY > height-20) {
     int x_in  = int(in_point  * float(width));
@@ -108,7 +133,11 @@ void mousePressed() {
   edit_slot_mode = 2;
 }
 
-void mouseDragged() {
+
+//                                                                                  ________________
+//_________________________________________________________________________________/ mouseDragged()
+void mouseDragged()
+{
   if(edit_timeline_mode == 1) {
     in_point = float(mouseX) / float(width);
     if(in_point < 0) {
@@ -134,16 +163,44 @@ void mouseDragged() {
     return;
   }
   if(edit_slot_mode == 1) {
-    edit_slot.start = current_time; // (((float)mouseX) / ((float)width)) * ((float)mov.duration());
+    edit_slot.start = current_time;
     return;
   }
   if(edit_slot_mode == 2) {
-    edit_slot.end = current_time; // (((float)mouseX) / ((float)width)) * ((float)mov.duration());
+    edit_slot.end = current_time;
     return;
   }
 }
 
-void mouseReleased() {
+//                                                                                  ________________
+//_________________________________________________________________________________/ mouseReleased()
+void mouseReleased()
+{
+  // While we're apparently editing: check if its time to make an autosave
+  int now = millis();
+  if(now - last_autosave > 60000) {
+    saveAnnotations(path+".autosave");
+    last_autosave = now;
+  }
+  
+  // 
+  if(mouseButton == RIGHT) {
+    // right mouse button click: delete timeslot if applicable
+    int i = mouseY / 20;
+    if(i < 0 || i >= annotations.size()) {
+      return;
+    }
+    ArrayList<Timeslot> timeslots = annotations.get(i).timeslots;
+    for(int j = timeslots.size()-1; j>=0; j--) {
+      Timeslot t = timeslots.get(j);
+      //float mouseT = float(mouseX) * mov.duration() / float(width);
+      if(t.start <= current_time && t.end >= current_time) {
+        timeslots.remove(j);
+        return;
+      }
+    }
+    return; // nothing else to do for right mouse button
+  }
   if(edit_timeline_mode != 0) {
     edit_timeline_mode = 0;
     return;

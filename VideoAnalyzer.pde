@@ -1,4 +1,4 @@
-import java.io.File;
+
 import processing.video.*;
 
 String path = "C:/Users/max-k/GoogleDrive/userstudy/02_2DUI_small.mp4";
@@ -30,7 +30,11 @@ int     edit_timeline_mode = 0; // 0=no editing, 1=edit in-point, 2=edit out-poi
 
 ArrayList<Annotation> annotations = new ArrayList<Annotation>();
 
-void setup() {
+
+//                                                                              ____________________
+//_____________________________________________________________________________/     setup()
+void setup()
+{
   size(1900, 1000); // displayWidth, displayHeight); // mov.width/2, mov.height/2);
   if (surface != null) {
     surface.setResizable(true);
@@ -42,16 +46,21 @@ void setup() {
   mov.pause();
   mov.speed(1);
   mov.volume(0);
-  loadAnnotations();
+  loadAnnotations(path);
 }
-void movieEvent(Movie m) {
+
+//                                                                              ____________________
+//_____________________________________________________________________________/  movieEvent()
+void movieEvent(Movie m)
+{
   m.read();
 }
 
 
-
-
-void draw() {
+//                                                                              ____________________
+//_____________________________________________________________________________/    draw()
+void draw()
+{
   // if CTRL is pressed, loop around current position
   if(ctrl_pressed) {
     mov.play();
