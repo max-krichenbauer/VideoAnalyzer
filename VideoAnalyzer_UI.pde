@@ -1,5 +1,8 @@
 
-int last_autosave = 0;
+int last_autosave = 0; // when was the last auto-save (in ms since program start)
+
+int mouseX_offset = 0; // interaction offset (mouse pointer to pivot etc)
+int mouseY_offset = 0; // interaction offset (mouse pointer to pivot etc)
 
 
 //                                                                                  ________________
@@ -94,14 +97,22 @@ void mousePressed()
   if(mouseY > height-20) {
     int x_in  = int(in_point  * float(width));
     int x_out = int(out_point * float(width));
-    if(mouseX >= x_in && mouseX <= x_in+20) {
+    if(mouseX > x_out || mouseX < x_in) {
+      return; // outside of time slider
+    }
+    if(mouseX <= x_in+20) { // in-handle
       edit_timeline_mode = 1;
       in_point = float(mouseX) / float(width);
+      return;
     }
-    if(mouseX >= x_out-20 && mouseX <= x_out) {
+    if(mouseX >= x_out-20) { // out-handle
       edit_timeline_mode = 2;
       out_point = float(mouseX) / float(width);
-    }
+      return;
+    } // else: handle middle
+    edit_timeline_mode = 3;
+    mouseX_offset = mouseX;
+    return; // since we're in the lower line, we don't need to check of other interaction
   }
   // else: creating/editing time slots
   int i = mouseY / 20;
@@ -156,6 +167,18 @@ void mouseDragged()
     if(out_point <= in_point) {
       out_point = in_point + 0.01;
     }
+    return;
+  }
+  if(edit_timeline_mode == 3) {
+    float delta = float(mouseX - mouseX_offset) / float(width);
+    if(delta > 0 && out_point+delta > 1.0) {
+      delta = 1.0-out_point;
+    } else if (delta < 0 && in_point+delta < 0.0) {
+      delta = -in_point;
+    }
+    in_point  = in_point + delta;
+    out_point = out_point + delta;
+    mouseX_offset = mouseX;
     return;
   }
   

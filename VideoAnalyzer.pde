@@ -88,8 +88,10 @@ void draw()
   fill(#AAAAFF, 127);
   int x_in  = int(in_point  * float(width));
   int x_out = int(out_point * float(width));
+  rect(x_in    , height-20, x_out-x_in, 20);
   rect(x_in    , height-20, 20, 20);
   rect(x_out-20, height-20, 20, 20);
+  
   float t_range = out_point - in_point;
   
   // indicate current selected time
@@ -119,17 +121,20 @@ void draw()
     line(0, (i+1)*20, width, (i+1)*20);
     
     // draw the time slots
-    float f = float(width) / mov.duration();
+    float f = float(width) / t_range;
     for(Timeslot timeslot : annotation.timeslots) {
+      if(timeslot.end < in_point || timeslot.start < out_point) {
+        continue; // this timeslot is outside of of the current view
+      }
       if(timeslot == edit_slot) {
         fill(#FFFF00, 127);
       } else {
         fill(#FFFFFF, 127);
       }
-      //int x0 = int(timeslot.start * f);
-      //int x1 = int(timeslot.end   * f);
-      int x0 = int(width * ((timeslot.start / mov.duration())-in_point) / t_range);
-      int x1 = int(width * ((timeslot.end   / mov.duration())-in_point) / t_range);
+      //int x0 = int(width * ((timeslot.start / mov.duration())-in_point) / t_range);
+      //int x1 = int(width * ((timeslot.end   / mov.duration())-in_point) / t_range);
+      int x0 = int(f * ((timeslot.start / mov.duration())-in_point));
+      int x1 = int(f * ((timeslot.end   / mov.duration())-in_point));
       rect(x0, i*20, 
            x1-x0, 20);
     }

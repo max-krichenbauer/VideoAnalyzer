@@ -47,12 +47,19 @@ void saveAnnotations(String path)
   for(Annotation annotation : annotations) {
     f.print(annotation.name + ":");
     for(Timeslot timeslot : annotation.timeslots) {
+      // check for mix-ups
+      if(timeslot.start > timeslot.end) {
+        float swap = timeslot.start;
+        timeslot.start = timeslot.end;
+        timeslot.end = swap;
+      }
       f.print(timeslot.start + "-" + timeslot.end + ";");
     }
     f.println();
   }
   f.flush();  // Writes the remaining data to the file
   f.close();  // Finishes the file
+  println("Saved file at "+path+".log");
 }
 
 
