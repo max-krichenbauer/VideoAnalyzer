@@ -1,7 +1,15 @@
+/***********************************************************************************************//**
+ *                                         VideoAnalyzer
+ **************************************************************************************************/
 
+// Path to video file to analyze
+String path = "C:/Users/max-k/GoogleDrive/userstudy/02_2DUI_small.mp4";
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 import processing.video.*;
 
-String path = "C:/Users/max-k/GoogleDrive/userstudy/02_2DUI_small.mp4";
 Movie mov;
 
 class Timeslot {
@@ -35,7 +43,9 @@ ArrayList<Annotation> annotations = new ArrayList<Annotation>();
 //_____________________________________________________________________________/     setup()
 void setup()
 {
-  size(1900, 1000); // displayWidth, displayHeight); // mov.width/2, mov.height/2);
+  //fullScreen();
+  size(800, 600);
+  
   if (surface != null) {
     surface.setResizable(true);
   }
