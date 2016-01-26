@@ -83,6 +83,12 @@ void keyReleased()
       }
     }
   }
+  
+  // [P] KEY:
+  // Print stats
+  if(key=='p' || key=='P') {
+    printStats();
+  }
 }
 
 
@@ -236,5 +242,31 @@ void mouseReleased()
     }
     edit_slot_mode = 0;
     edit_slot = null;
+  }
+}
+
+//                                                                                  ________________
+//_________________________________________________________________________________/  printStats()
+void printStats()
+{
+  float in_point_sec = in_point*mov.duration(); // in-point in seconds
+  float out_point_sec = out_point*mov.duration(); // out-point in seconds
+  println("Total movie duration: "+String.format("%.1f",mov.duration()) + "s");
+  println("Time window duration: "+(out_point_sec-in_point_sec) + "s ("+((out_point-in_point)*100)+"%)");
+  
+  for(Annotation annotation : annotations) {
+    float movie_total = 0;
+    float window_total = 0;
+    // add up the time slots
+    for(Timeslot timeslot : annotation.timeslots) {
+      movie_total += (timeslot.end - timeslot.start);
+      if(timeslot.end < in_point_sec || timeslot.start > out_point_sec) {
+        continue; // this timeslot is totally outside of of the current view
+      }
+      float start = (timeslot.start > in_point_sec ) ? timeslot.start : in_point_sec; // crop to window
+      float end   = (timeslot.end   < out_point_sec) ? timeslot.end   : out_point_sec; // crop to window
+      window_total += (end-start);
+    }
+    println(annotation.name + ": "+ movie_total+"s total, "+window_total+"s in window");
   }
 }

@@ -3,7 +3,7 @@
  **************************************************************************************************/
 
 // Path to video file to analyze
-String path = "C:/Users/max-k/GoogleDrive/userstudy/02_2DUI_small.mp4";
+String path = "C:/Users/max-k/GoogleDrive/userstudy/01/01_2DUI_small.mp4";
 
 
 
@@ -13,12 +13,12 @@ import processing.video.*;
 Movie mov;
 
 class Timeslot {
-  float start;
-  float end;
+  float start; // start of the timeslot (in seconds)
+  float end;   // end of the timeslot (in seconds)
 }
 
 class Annotation {
-  String name;
+  String name; // name of the annotation track
   ArrayList<Timeslot> timeslots = new ArrayList<Timeslot>();
 }
 
@@ -124,6 +124,8 @@ void draw()
   
   int i = 0;
   textSize(10);
+  float in_point_sec = in_point*mov.duration(); // in-point in seconds
+  float out_point_sec = out_point*mov.duration(); // out-point in seconds
   for(Annotation annotation : annotations) {
     stroke(#FFFFFF, 127);
     line(0, (i+1)*20+1, width, (i+1)*20+1);
@@ -133,7 +135,7 @@ void draw()
     // draw the time slots
     float f = float(width) / t_range;
     for(Timeslot timeslot : annotation.timeslots) {
-      if(timeslot.end < in_point || timeslot.start < out_point) {
+      if(timeslot.end < in_point_sec || timeslot.start > out_point_sec) {
         continue; // this timeslot is outside of of the current view
       }
       if(timeslot == edit_slot) {
@@ -141,8 +143,6 @@ void draw()
       } else {
         fill(#FFFFFF, 127);
       }
-      //int x0 = int(width * ((timeslot.start / mov.duration())-in_point) / t_range);
-      //int x1 = int(width * ((timeslot.end   / mov.duration())-in_point) / t_range);
       int x0 = int(f * ((timeslot.start / mov.duration())-in_point));
       int x1 = int(f * ((timeslot.end   / mov.duration())-in_point));
       rect(x0, i*20, 
