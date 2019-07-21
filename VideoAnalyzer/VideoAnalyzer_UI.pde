@@ -251,8 +251,10 @@ void printStats()
 {
   float in_point_sec = in_point*mov.duration(); // in-point in seconds
   float out_point_sec = out_point*mov.duration(); // out-point in seconds
-  println("Total movie duration: "+String.format("%.1f",mov.duration()) + "s");
-  println("Time window duration: "+(out_point_sec-in_point_sec) + "s ("+((out_point-in_point)*100)+"%)");
+  float movie_duration = mov.duration();
+  float window_duration = out_point_sec-in_point_sec;
+  println("Total movie duration: "+String.format("%.1f",movie_duration) + "s");
+  println("Time window duration: "+ window_duration + "s ("+((out_point-in_point)*100)+"%)");
   
   for(Annotation annotation : annotations) {
     float movie_total = 0;
@@ -267,6 +269,6 @@ void printStats()
       float end   = (timeslot.end   < out_point_sec) ? timeslot.end   : out_point_sec; // crop to window
       window_total += (end-start);
     }
-    println(annotation.name + ": "+ movie_total+"s total, "+window_total+"s in window");
+    println(annotation.name + ": "+ movie_total+"s total, ("+ String.format("%.1f",100.0*movie_total/movie_duration) +"%); "+window_total+"s in window ("+String.format("%.1f",100.0*window_total/window_duration)+"%)");
   }
 }
