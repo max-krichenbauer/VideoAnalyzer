@@ -7,6 +7,8 @@ Something that can't be done automatically, like specific actions taken by the p
 VideoAnalyzer was written to make this work easier: just drag the mouse over the video to mark each occurance.
 Especially useful for researches who have to analyze video recordings of experiments.
 
+![Screenshot](screenshot.png)
+
 It requires Processing3 to work (https://www.processing.org/)
 
 
